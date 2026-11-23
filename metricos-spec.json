@@ -1,0 +1,35 @@
+{
+  "name": "MetricOS",
+  "version": "1.0.0",
+  "codename": "OLED",
+  "base": "Debian 13 Trixie",
+  "architecture": "amd64",
+  "desktop": "KDE Plasma 6",
+  "tagline": "Performance, under your control.",
+  "feature_counts": {
+    "customizable_settings": 130,
+    "liquid_glass_appearance_controls": 60
+  },
+  "defaults": {
+    "theme": "MetricOS OLED",
+    "panel": "floating bottom-centered KDE Plasma panel",
+    "browsers": [
+      "Google Chrome Stable",
+      "Firefox ESR"
+    ],
+    "gaming": [
+      "GameMode",
+      "MangoHud",
+      "Lutris",
+      "Vulkan tools"
+    ],
+    "audio": "PipeWire"
+  },
+  "notes": [
+    "Live ISO with Debian Installer live option.",
+    "Chrome comes from Google\u2019s official signed APT repository; the build hook verifies the public key fingerprint.",
+    "Steam is offered as an opt-in installer to keep the default image smaller and to enable i386 cleanly at install time.",
+    "Most control-center preferences persist in the MetricOS user profile; only documented native mappings change KDE or power profiles.",
+    "Gamescope is not included because it is not available as a Debian 13 stable package in the checked repository catalogue."
+  ]
+}

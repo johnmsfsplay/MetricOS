@@ -1,0 +1,32 @@
+METRICOS 1.0 — SOURCE QA REPORT
+Date: 2026-11-23
+
+SOURCE CHECKS
+[PASS] 10 Python unit tests (settings counts, unique identifiers, category map, defaults/ranges,
+       package list sanity, Google signing-key fingerprint, build dependency order and path guards)
+[PASS] Control Center Python source compiles with py_compile
+[PASS] Bash syntax: build-iso.sh, verify-iso.sh
+[PASS] POSIX shell syntax: all chroot hooks, installed launchers and post-boot installer helpers
+[PASS] JSON syntax: metricos-spec.json and settings-catalog.json
+[PASS] Settings catalog: 130 system controls + 60 appearance controls
+[PASS] Custom SVG wallpaper XML parses
+[PASS] Unsafe build path and invalid build-flag checks reject the input before build operations
+[PASS] Obsolete package plasma-workspace-wayland removed; uses plasma-workspace + kwin-wayland
+[PASS] ZIP/archive manifest is generated from included project files and SHA-256 digests
+[PASS] Windows cloud-build guide and GitHub Actions workflow are included
+[PASS] Cloud workflow runs project tests before building and verifies ISO structure plus SHA-256 before upload
+[PASS] Build script checks available disk space before installing packages/building
+
+BUILD / RUNTIME CHECKS NOT COMPLETED
+[BLOCKED] Actual Debian Live ISO build was attempted but the build script's network preflight failed:
+         MetricOS build error: No DNS/network access to deb.debian.org. Connect to the internet and retry.
+[BLOCKED] This environment does not have lb, xorriso, debootstrap, mksquashfs, grub-mkrescue or
+         qemu-system-x86_64 installed; the network/DNS restriction prevents fetching them.
+[NOT RUN] GitHub Actions cloud job; the workflow is prepared but has not been triggered from a user repository.
+[NOT RUN] Live boot, desktop interaction test, installer test, hardware / GPU / Wi-Fi checks,
+         real Chrome download, Steam install, QEMU/VirtualBox boot and independent malware scan.
+
+IMPORTANT
+This is a configured Debian Live build project, NOT an ISO image. No .iso file was produced.
+The static/source tests do not establish that the finished ISO boots or that all hardware works.
+Build on a network-connected Debian/Ubuntu/Linux Mint amd64 machine and boot-test in a disposable VM.

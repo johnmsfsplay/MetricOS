@@ -1,0 +1,188 @@
+[
+  {
+    "path": ".github/workflows/build-metricos.yml",
+    "bytes": 3482,
+    "mode": "0o644",
+    "sha256": "b47fdb0c827190ae2a46e0591acbf82b4e0f75c7443c567664df98eeb455af1f"
+  },
+  {
+    "path": ".gitignore",
+    "bytes": 48,
+    "mode": "0o644",
+    "sha256": "93233d4eb087d91d4199604eca2d0681d425753057351e9a4f56b652a82fa196"
+  },
+  {
+    "path": "BUILD-STATUS.md",
+    "bytes": 3491,
+    "mode": "0o644",
+    "sha256": "663cc704b6c51b02d0cf7f16c6a2b3d8ccd79cd5901e1e72f39a2309c00a61a6"
+  },
+  {
+    "path": "QA-REPORT.txt",
+    "bytes": 2232,
+    "mode": "0o644",
+    "sha256": "40f7728c44c9447ce944bc6e7b1355666df8127f9f3a4128c6fbd5be02a84459"
+  },
+  {
+    "path": "README.md",
+    "bytes": 6227,
+    "mode": "0o644",
+    "sha256": "db1a3fbe8e0ca6e618e93e5d820dc3b8bc1e4a34044b258445f805054909cd50"
+  },
+  {
+    "path": "WINDOWS-CLOUD-BUILD.md",
+    "bytes": 4767,
+    "mode": "0o644",
+    "sha256": "4016321553666acd1986678b6cebe2f6b4afd51e0f4e9d964c99e96529b1f303"
+  },
+  {
+    "path": "build-iso.sh",
+    "bytes": 4480,
+    "mode": "0o755",
+    "sha256": "0949973908d2ce9c762792302413619df3248c63132a780e9f713d34be7786d9"
+  },
+  {
+    "path": "config/hooks/normal/0100-metricos-permissions.hook.chroot",
+    "bytes": 338,
+    "mode": "0o755",
+    "sha256": "a425fbe058318887c394ed6d1dab37b639cf7be1d9f2859f86eca7b538653f11"
+  },
+  {
+    "path": "config/hooks/normal/0900-google-chrome.hook.chroot",
+    "bytes": 852,
+    "mode": "0o755",
+    "sha256": "bca69c062da1862d743937b80f42ee508c09410aa374cd895ba8e989a8778df0"
+  },
+  {
+    "path": "config/includes.chroot/etc/skel/.config/autostart/metricos-first-run.desktop",
+    "bytes": 146,
+    "mode": "0o644",
+    "sha256": "6e967d3a7a031842f0b4808988bc5110017189d29b0ad072ffc67656a5506e49"
+  },
+  {
+    "path": "config/includes.chroot/etc/skel/.config/kdeglobals",
+    "bytes": 243,
+    "mode": "0o644",
+    "sha256": "04b013afc97fa89a1abca87bf44a60371e320ad48575bdf89943cb82fdb1676c"
+  },
+  {
+    "path": "config/includes.chroot/etc/skel/.config/kwinrc",
+    "bytes": 80,
+    "mode": "0o644",
+    "sha256": "e67e41af1c5b8e4e31ae846ae8046ac16a0a9a5b8759e72503fa149730f9eb3d"
+  },
+  {
+    "path": "config/includes.chroot/etc/skel/.config/plasmashellrc",
+    "bytes": 132,
+    "mode": "0o644",
+    "sha256": "9513f728364e9d961fccea4193a664e8e2fdbc25dabbafcf392645525144168a"
+  },
+  {
+    "path": "config/includes.chroot/usr/local/bin/metricos-control-center",
+    "bytes": 84,
+    "mode": "0o644",
+    "sha256": "ae112a64579cc9c99f2b2753d50adc78c4decd7b1761fe9c0d148970ae0ee8d7"
+  },
+  {
+    "path": "config/includes.chroot/usr/local/bin/metricos-first-run",
+    "bytes": 919,
+    "mode": "0o644",
+    "sha256": "c50d1fdb8658f0b27b20ea3454ba8f60a7a8506d310f2edbc9b5f1fdb2bd4428"
+  },
+  {
+    "path": "config/includes.chroot/usr/local/bin/metricos-game",
+    "bytes": 417,
+    "mode": "0o644",
+    "sha256": "45622171437b1f20999a597fb796de71a948fbe3216b333d4127eb3c5b929348"
+  },
+  {
+    "path": "config/includes.chroot/usr/local/libexec/metricos/install-chrome",
+    "bytes": 1079,
+    "mode": "0o644",
+    "sha256": "d7818441decfe5a88b751ffc4fbe28a309ec774748bb8c77a283ef13ce191ce0"
+  },
+  {
+    "path": "config/includes.chroot/usr/local/libexec/metricos/install-steam",
+    "bytes": 536,
+    "mode": "0o644",
+    "sha256": "95d6c3b72358f1bb667464ac1154454c443e8d9d416e6b9b7562b1b90cbb56ef"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/applications/metricos-chrome-installer.desktop",
+    "bytes": 234,
+    "mode": "0o644",
+    "sha256": "f006492ecc8af441cd68ca6bb3b72c81c26b23a62cd0d289b6d522dcca7ecafe"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/applications/metricos-control-center.desktop",
+    "bytes": 228,
+    "mode": "0o644",
+    "sha256": "d2da58ad886fda18bc6bf49e37d1ec3e061b2a1583b45f92ff9254645b9732f6"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/applications/metricos-steam-installer.desktop",
+    "bytes": 241,
+    "mode": "0o644",
+    "sha256": "a43dc96ff87438d5b618ab506190931ab4340d9c5e5004cc360aa2aee71a1b9a"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/color-schemes/MetricOS-Carbon.colors",
+    "bytes": 2400,
+    "mode": "0o644",
+    "sha256": "c97aef1bdfb3fe0d8c275c2a6ae5a1c31098c9b7774b64ff306604e9bc0ca2d5"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/color-schemes/MetricOS-OLED.colors",
+    "bytes": 2405,
+    "mode": "0o644",
+    "sha256": "b72f1a54fcd77353945104b43617a8f32052a7f39f58b29c5bfff79a4a0ab19c"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/metricos/metricos-control-center.py",
+    "bytes": 15911,
+    "mode": "0o644",
+    "sha256": "52e3a37bba9bc0f9079d7e1cecdcac288c7d6c9389357a8bca134d9a7c4ec09f"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/metricos/settings-catalog.json",
+    "bytes": 51081,
+    "mode": "0o644",
+    "sha256": "160cbb0eca276f397786f53bc68b6b096a6231daee280f6ada48ad359ee8ac21"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/wallpapers/MetricOS-OLED/contents/images/3840x2160.svg",
+    "bytes": 1899,
+    "mode": "0o644",
+    "sha256": "df36635aee0cc957f64389053ead609793f01a07a965e85d3cbee9ecf061c408"
+  },
+  {
+    "path": "config/includes.chroot/usr/share/wallpapers/MetricOS-OLED/metadata.json",
+    "bytes": 300,
+    "mode": "0o644",
+    "sha256": "43b957db841f0284746f92124a05148356c9c7a0a0831d51779c0e659247e0c9"
+  },
+  {
+    "path": "config/package-lists/metricos.list.chroot",
+    "bytes": 881,
+    "mode": "0o644",
+    "sha256": "7ffe41c14515ba0864196d994e264fe01c414cb289f419dc194732c737749676"
+  },
+  {
+    "path": "metricos-spec.json",
+    "bytes": 1194,
+    "mode": "0o644",
+    "sha256": "232f16255aaee1f1c903195fc056e5952d477a440909d914acd60321b21d3ee6"
+  },
+  {
+    "path": "tests/test_project.py",
+    "bytes": 4361,
+    "mode": "0o644",
+    "sha256": "6daae822e100433f6ac5742cc80dcd0f1423a7c09e7badf74141551409839a22"
+  },
+  {
+    "path": "verify-iso.sh",
+    "bytes": 1005,
+    "mode": "0o755",
+    "sha256": "61d4ea453a206d5938039a9e58d25eaad1e83666bbcf34ae328154bde485cdfb"
+  }
+]
