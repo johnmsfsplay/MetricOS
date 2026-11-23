@@ -1,4 +1,5 @@
 name: Build MetricOS ISO
+# Workflow revision: v5 — APT simulation preflight replaces fragile apt-cache grep.
 
 "on":
   workflow_dispatch:
@@ -537,21 +538,39 @@ jobs:
 
           package_file="config/package-lists/metricos.list.chroot"
           [[ -s "$package_file" ]] || { echo "Missing package list: $package_file" >&2; exit 44; }
-          missing_packages=()
+
+          # Do not use `apt-cache show | grep Package:` as an availability
+          # test: it can misclassify valid multi-version / security-updated
+          # packages. Ask APT to resolve the complete requested package set
+          # in simulation mode, matching the actual live-build inputs.
+          metricos_packages=()
           while IFS= read -r package || [[ -n "$package" ]]; do
             package="${package%%#*}"
-            package="$(printf "%s" "$package" | tr -d "[:space:]\r")"
+            package="$(printf "%s" "$package" | tr -d "[:space:]")"
             [[ -z "$package" ]] && continue
-            if ! apt-cache show "$package" 2>/dev/null | grep -Fqx "Package: $package"; then
-              missing_packages+=("$package")
-            fi
+            metricos_packages+=("$package")
           done < "$package_file"
+          if (( ${#metricos_packages[@]} == 0 )); then
+            echo "MetricOS package list is empty after comment/whitespace filtering." >&2
+            exit 44
+          fi
 
-          if (( ${#missing_packages[@]} > 0 )); then
-            printf "Unavailable package(s) in Debian Trixie: %s\n" "${missing_packages[*]}" >&2
+          echo "Preflighting ${#metricos_packages[@]} explicitly requested MetricOS packages with APT simulation..."
+          preflight_log="/workspace/output/package-preflight.log"
+          if ! apt-get --simulate --no-install-recommends \
+              -o Dpkg::Use-Pty=0 -o Debug::NoLocking=1 \
+              install "${metricos_packages[@]}" >"$preflight_log" 2>&1; then
+            echo "APT could not resolve the complete MetricOS package set. Details follow:" >&2
+            cat "$preflight_log" >&2
+            echo "Package candidates for diagnosis:" >&2
+            for package in "${metricos_packages[@]}"; do
+              echo "--- $package ---" >&2
+              apt-cache policy "$package" 2>&1 | head -n 12 >&2 || true
+            done
             exit 42
           fi
-          echo "All MetricOS package names are available in Debian Trixie."
+          echo "APT successfully resolved all ${#metricos_packages[@]} MetricOS packages and their required dependencies."
+          tail -n 25 "$preflight_log"
 
           ./build-iso.sh' \
             2>&1 | tee output/workflow-build.log
