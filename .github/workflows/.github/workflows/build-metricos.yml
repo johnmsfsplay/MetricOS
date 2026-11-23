@@ -1,0 +1,101 @@
+name: Build MetricOS ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      with_chrome:
+        description: Include Google Chrome Stable (Firefox ESR is always included)
+        required: true
+        type: boolean
+        default: true
+      with_installer:
+        description: Include the Debian live installer
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metricos-iso-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Debian 13 MetricOS ISO (amd64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      WITH_CHROME: ${{ inputs.with_chrome && '1' || '0' }}
+      WITH_INSTALLER: ${{ inputs.with_installer && '1' || '0' }}
+    steps:
+      # Reclaim space from preinstalled SDKs not needed for a Debian live image.
+      # These paths are on the disposable GitHub-hosted runner, not the user's PC.
+      - name: Free runner disk space
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          sudo rm -rf \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/share/swift
+          sudo apt-get clean
+          if command -v docker >/dev/null 2>&1; then
+            sudo docker image prune --all --force || true
+          fi
+          echo "Disk space after cleanup:"
+          df -h /
+          AVAILABLE_GB="$(df -Pk / | awk 'END {print int($4 / 1024 / 1024)}')"
+          if [ "$AVAILABLE_GB" -lt 27 ]; then
+            echo "::error::The hosted runner has only ${AVAILABLE_GB} GiB free after cleanup; MetricOS needs about 25 GiB plus build-tool overhead. The standard hosted runner may be too small today."
+            exit 1
+          fi
+
+      - name: Check out MetricOS source
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Run source tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 -m unittest discover -s tests -v
+          python3 -m py_compile config/includes.chroot/usr/share/metricos/metricos-control-center.py
+          bash -n build-iso.sh verify-iso.sh
+          for f in config/hooks/normal/*.hook.chroot config/includes.chroot/usr/local/bin/* config/includes.chroot/usr/local/libexec/metricos/*; do
+            [ ! -f "$f" ] || sh -n "$f"
+          done
+          python3 -m json.tool metricos-spec.json >/dev/null
+          python3 -m json.tool config/includes.chroot/usr/share/metricos/settings-catalog.json >/dev/null
+
+      - name: Build ISO
+        shell: bash
+        run: sudo --preserve-env=WITH_CHROME,WITH_INSTALLER ./build-iso.sh
+
+      - name: Verify ISO structure and checksum
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          ./verify-iso.sh output/metricos-1.0-amd64.iso
+          sha256sum -c output/metricos-1.0-amd64.iso.sha256
+          test -s output/BUILD-INFO.txt
+          test -s output/metricos-build.log
+
+      - name: Upload ISO and build logs (also on failure, when available)
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: MetricOS-1.0-amd64-ISO
+          path: |
+            output/metricos-1.0-amd64.iso
+            output/metricos-1.0-amd64.iso.sha256
+            output/BUILD-INFO.txt
+            output/metricos-build.log
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
