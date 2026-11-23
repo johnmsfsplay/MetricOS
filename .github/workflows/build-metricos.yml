@@ -476,17 +476,25 @@ jobs:
 
           echo "MetricOS source validation passed."
 
-      - name: Build ISO
+      - name: Build ISO in a Debian 13 Trixie container
         shell: bash
         run: |
           set -Eeuo pipefail
           mkdir -p output
+          docker info >/dev/null
           set +e
-          sudo --preserve-env=WITH_CHROME,WITH_INSTALLER ./build-iso.sh 2>&1 | tee output/workflow-build.log
+          docker run --pull=always --rm --privileged \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace \
+            --env WITH_CHROME="$WITH_CHROME" \
+            --env WITH_INSTALLER="$WITH_INSTALLER" \
+            debian:trixie \
+            bash -lc 'set -Eeuo pipefail; echo "Build host:"; cat /etc/os-release; ./build-iso.sh' \
+            2>&1 | tee output/workflow-build.log
           build_status=${PIPESTATUS[0]}
           set -e
           if [[ "$build_status" -ne 0 ]]; then
-            echo "::error::MetricOS ISO build failed with exit code ${build_status}. See the uploaded diagnostic artifact for the build logs."
+            echo "::error::MetricOS ISO build failed inside the Debian Trixie container with exit code ${build_status}. See the uploaded diagnostic artifact for the build logs."
             exit "$build_status"
           fi
 
