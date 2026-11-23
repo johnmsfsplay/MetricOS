@@ -1,5 +1,5 @@
 name: Build MetricOS ISO
-# Workflow revision: v5 — APT simulation preflight replaces fragile apt-cache grep.
+# Workflow revision: v6 — Verify ISO with xorriso inside the Debian builder container.
 
 "on":
   workflow_dispatch:
@@ -572,7 +572,11 @@ jobs:
           echo "APT successfully resolved all ${#metricos_packages[@]} MetricOS packages and their required dependencies."
           tail -n 25 "$preflight_log"
 
-          ./build-iso.sh' \
+          ./build-iso.sh
+
+          echo "Verifying ISO inside the Debian Trixie container (xorriso is installed here)..."
+          ./verify-iso.sh output/metricos-1.0-amd64.iso
+          sha256sum -c output/metricos-1.0-amd64.iso.sha256' \
             2>&1 | tee output/workflow-build.log
           build_status=${PIPESTATUS[0]}
           set -e
@@ -581,16 +585,18 @@ jobs:
             exit "$build_status"
           fi
 
-      - name: Verify ISO structure and checksum
+      - name: Verify ISO checksum and build metadata on runner
         shell: bash
         run: |
           set -Eeuo pipefail
           test -s output/metricos-1.0-amd64.iso
           test -s output/metricos-1.0-amd64.iso.sha256
-          ./verify-iso.sh output/metricos-1.0-amd64.iso
-          sha256sum -c output/metricos-1.0-amd64.iso.sha256
           test -s output/BUILD-INFO.txt
-          echo "MetricOS ISO passed structural and SHA-256 checks."
+          # ISO9660 / El Torito inspection already ran inside the Debian
+          # Trixie container, where build-iso.sh installed xorriso.
+          # The GitHub Ubuntu runner only performs an independent hash check.
+          sha256sum -c output/metricos-1.0-amd64.iso.sha256
+          echo "MetricOS ISO exists, has build metadata, and passed SHA-256 verification."
 
       - name: Upload ISO and diagnostics
         if: always()
