@@ -431,6 +431,34 @@ jobs:
             echo "All required MetricOS config files are present; using repository versions."
           fi
 
+      - name: Normalize Debian Trixie package names
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          package_list="config/package-lists/metricos.list.chroot"
+          if [[ ! -s "$package_list" ]]; then
+            echo "::error::MetricOS package list is missing: $package_list"
+            exit 1
+          fi
+
+          # Debian 13 renamed the KDE screenshot utility binary package.
+          # Keep this normalization here so it also applies when config/ is
+          # restored from the embedded fallback archive.
+          if grep -qx 'spectacle' "$package_list"; then
+            sed -i 's/^spectacle$/kde-spectacle/' "$package_list"
+            echo "Updated Debian Trixie package name: spectacle -> kde-spectacle"
+          fi
+
+          if grep -qx 'spectacle' "$package_list"; then
+            echo "::error::Legacy package name 'spectacle' remains in $package_list"
+            exit 1
+          fi
+          grep -qx 'kde-spectacle' "$package_list" || {
+            echo "::error::Expected kde-spectacle in $package_list"
+            exit 1
+          }
+          echo "Debian Trixie package list normalization passed."
+
       - name: Validate MetricOS source files
         shell: bash
         run: |
@@ -489,12 +517,48 @@ jobs:
             --env WITH_CHROME="$WITH_CHROME" \
             --env WITH_INSTALLER="$WITH_INSTALLER" \
             debian:trixie \
-            bash -lc 'set -Eeuo pipefail; echo "Build host:"; cat /etc/os-release; ./build-iso.sh' \
+            bash -lc 'set -Eeuo pipefail
+          echo "Build host:"
+          cat /etc/os-release
+
+          # Debian slim images use deb822 sources. Enable every component
+          # requested by MetricOS (including contrib/non-free firmware).
+          if [[ -f /etc/apt/sources.list.d/debian.sources ]]; then
+            sed -i -E "s/^Components:.*/Components: main contrib non-free non-free-firmware/" /etc/apt/sources.list.d/debian.sources
+          elif [[ -f /etc/apt/sources.list ]]; then
+            sed -i -E "s/^([[:space:]]*deb(-src)?[[:space:]].*[[:space:]])main([[:space:]]|$)/\1main contrib non-free non-free-firmware\3/" /etc/apt/sources.list
+          else
+            echo "No Debian APT sources file was found in the Trixie container." >&2
+            exit 43
+          fi
+
+          echo "Refreshing Debian Trixie package indexes..."
+          apt-get update
+
+          package_file="config/package-lists/metricos.list.chroot"
+          [[ -s "$package_file" ]] || { echo "Missing package list: $package_file" >&2; exit 44; }
+          missing_packages=()
+          while IFS= read -r package || [[ -n "$package" ]]; do
+            package="${package%%#*}"
+            package="$(printf "%s" "$package" | tr -d "[:space:]\r")"
+            [[ -z "$package" ]] && continue
+            if ! apt-cache show "$package" 2>/dev/null | grep -Fqx "Package: $package"; then
+              missing_packages+=("$package")
+            fi
+          done < "$package_file"
+
+          if (( ${#missing_packages[@]} > 0 )); then
+            printf "Unavailable package(s) in Debian Trixie: %s\n" "${missing_packages[*]}" >&2
+            exit 42
+          fi
+          echo "All MetricOS package names are available in Debian Trixie."
+
+          ./build-iso.sh' \
             2>&1 | tee output/workflow-build.log
           build_status=${PIPESTATUS[0]}
           set -e
           if [[ "$build_status" -ne 0 ]]; then
-            echo "::error::MetricOS ISO build failed inside the Debian Trixie container with exit code ${build_status}. See the uploaded diagnostic artifact for the build logs."
+            echo "::error::MetricOS ISO build failed inside the Debian Trixie container with exit code ${build_status}. See output/workflow-build.log and output/metricos-build.log in the diagnostic artifact."
             exit "$build_status"
           fi
 
@@ -520,6 +584,6 @@ jobs:
             output/BUILD-INFO.txt
             output/metricos-build.log
             output/workflow-build.log
-          if-no-files-found: warn
+          if-no-files-found: ignore
           compression-level: 0
           retention-days: 14
